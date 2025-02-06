@@ -1,0 +1,15 @@
+body {
+  font-family: sans-serif;
+  text-align: left;
+}
+pre {
+  padding: 10px;
+  white-space: pre-wrap;
+  color: white;
+}
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+}

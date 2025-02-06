@@ -61,15 +61,17 @@ class SnippetReelWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   private getWebviewContent(): string {
+    // style.css 파일의 경로를 webview에서 로드할 수 있는 URI로 변환
+    const styleUri = this._view?.webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "src", "style.css")
+    );
+
     return `
       <!DOCTYPE html>
       <html>
       <head>
-          <style>
-              body { font-family: sans-serif; text-align: center; }
-              pre { background:rgb(83, 76, 76); padding: 10px; white-space: pre-wrap; color: white; }
-              .container { height: 100vh; display: flex; flex-direction: column; justify-content: center; }
-          </style>
+          <!-- style.css 파일을 웹뷰에 링크 -->
+          <link rel="stylesheet" type="text/css" href="${styleUri}">
       </head>
       <body>
           <div class="container">

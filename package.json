@@ -22,7 +22,7 @@
       }
     ],
     "viewsContainers": {
-      "activitybar": [
+      "panel": [
         {
           "id": "dumbActivitybarContainer",
           "title": "Snippet Reels",
