@@ -9,7 +9,10 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:dumbWebview",
+    "onCommand:snippetReels.start"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -17,7 +20,26 @@
         "command": "snippetReels.start",
         "title": "Hello World"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dumbActivitybarContainer",
+          "title": "Snippet Reels",
+          "icon": "media/dumb.svg"
+        }
+      ]
+    },
+    "views": {
+      "dumbActivitybarContainer": [
+        {
+          "id": "dumbWebview",
+          "name": "Snippet Reels",
+          "type": "webview",
+          "command": "snippetReels.start"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
