@@ -66,36 +66,34 @@ class SnippetReelWebviewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, "src", "style.css")
     );
 
-    const prismJsUri =
-      "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js";
-    const prismCssUri =
-      "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+    const highlightJsUri =
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js";
+    const highlightCssUri =
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css";
 
     return `
     <!DOCTYPE html>
     <html>
     <head>
-        <!-- Prism.js CSS 파일 -->
-        <link rel="stylesheet" href="${prismCssUri}">
+        <!-- Highlight.js CSS 파일 -->
+        <link rel="stylesheet" href="${highlightCssUri}">
         <!-- style.css 파일을 웹뷰에 링크 -->
         <link rel="stylesheet" type="text/css" href="${styleUri}">
     </head>
     <body>
-        <div class="container">
-            <pre id="snippet" class="language-javascript"></pre> <!-- 하이라이팅할 코드의 언어를 지정 -->
-        </div>
-        <script src="${prismJsUri}"></script> <!-- Prism.js 자바스크립트 추가 -->
+        <pre id="snippet" class="language-javascript"></pre> <!-- 하이라이팅할 코드의 언어를 지정 -->
+        <script src="${highlightJsUri}"></script> <!-- Highlight.js 자바스크립트 추가 -->
         <script>
             const snippets = ${JSON.stringify(this._snippets)};
             let index = 0;
-
+  
             function updateSnippet() {
                 const snippetElement = document.getElementById('snippet');
                 snippetElement.textContent = snippets[index] || 'No snippets available';
-                // Prism.js로 코드 하이라이팅
-                Prism.highlightElement(snippetElement);
+                // Highlight.js로 코드 하이라이팅
+                hljs.highlightElement(snippetElement);
             }
-
+  
             function cycleSnippets() {
                 setInterval(() => {
                     index = (index + 1) % snippets.length;
