@@ -13,98 +13,110 @@ const SNIPPETS_FILE = path.join(__dirname, "../src", "snippets.json");
  * @param context
  */
 export function activate(context: vscode.ExtensionContext) {
-  // 웹뷰 패널을 보여주는 명령어를 삭제합니다. (기존의 onCommand는 필요없음)
+  let disposable = vscode.commands.registerCommand(
+    "snippetReels.start",
+    async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage(
+          "Open a file to get snippet recommendations."
+        );
+        return;
+      }
 
-  // `onView` 이벤트를 통해 뷰가 활성화될 때 웹뷰를 표시하도록 합니다.
-  vscode.window.registerWebviewViewProvider(
-    "dumbWebview",
-    new SnippetReelPanelProvider(context.extensionUri)
+      const extractedData: Map<string, string[]> = extractData(editor.document);
+      // get snippets based on the data
+      const snippets: string[] = getSnippets(SNIPPETS_FILE, extractedData);
+      // display
+      SnippetReelPanel.displayReels(context.extensionUri, snippets);
+    }
   );
+  context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}
 
-// 웹뷰를 띄우는 새로운 클래스입니다.
-class SnippetReelPanelProvider implements vscode.WebviewViewProvider {
-  private _view?: vscode.WebviewView;
-  private readonly extensionUri: vscode.Uri;
+// Display
+class SnippetReelPanel {
+  public static currentPanel: SnippetReelPanel | undefined;
+  private readonly panel: vscode.WebviewPanel;
+  private disposables: vscode.Disposable[] = [];
 
-  constructor(extensionUri: vscode.Uri) {
-    this.extensionUri = extensionUri;
-  }
-
-  // 뷰가 처음 활성화될 때 호출됩니다.
-  resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    context: vscode.WebviewViewResolveContext,
-    token: vscode.CancellationToken
-  ): void {
-    this._view = webviewView;
-
-    // 웹뷰에 필요한 초기 설정을 합니다.
-    this._view.webview.options = {
-      enableScripts: true,
-    };
-
-    // 데이터를 추출하여 스니펫을 가져옵니다.
-    const snippets = this.getSnippets();
+  private constructor(
+    panel: vscode.WebviewPanel,
+    snippets: string[],
+    extensionUri: vscode.Uri
+  ) {
+    this.panel = panel;
     this.updateWebview(snippets);
+    this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
   }
 
-  // 스니펫을 가져오는 로직입니다.
-  private getSnippets(): string[] {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showErrorMessage("No active editor found.");
-      return [];
+  public static displayReels(extensionUri: vscode.Uri, snippets: string[]) {
+    if (SnippetReelPanel.currentPanel) {
+      SnippetReelPanel.currentPanel.updateWebview(snippets);
+      SnippetReelPanel.currentPanel.panel.reveal(vscode.ViewColumn.One);
+    } else {
+      const panel = vscode.window.createWebviewPanel(
+        "snippetReels",
+        "Snippet Reels",
+        vscode.ViewColumn.One,
+        { enableScripts: true }
+      );
+      SnippetReelPanel.currentPanel = new SnippetReelPanel(
+        panel,
+        snippets,
+        extensionUri
+      );
     }
-
-    const extractedData: Map<string, string[]> = extractData(editor.document);
-    const snippets: string[] = getSnippets(SNIPPETS_FILE, extractedData); // 수정된 부분
-
-    console.log("Extracted Snippets:", snippets);
-    return snippets;
   }
 
-  // 웹뷰 내용을 업데이트하는 함수입니다.
   private updateWebview(snippets: string[]) {
-    if (!this._view) return;
-
-    this._view.webview.html = this.getWebviewContent(snippets);
+    this.panel.webview.html = this.getWebviewContent(snippets);
   }
 
-  // 웹뷰의 HTML 콘텐츠를 반환합니다.
   private getWebviewContent(snippets: string[]): string {
     return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-          <style>
-              body { font-family: sans-serif; text-align: center; }
-              pre { background:rgb(83, 76, 76); padding: 10px; white-space: pre-wrap; }
-              .container { height: 100vh; display: flex; flex-direction: column; justify-content: center; }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <pre id="snippet"></pre>
-          </div>
-          <script>
-              const snippets = ${JSON.stringify(snippets)};
-              let index = 0;
-              function updateSnippet() {
-                  document.getElementById('snippet').textContent = snippets[index] || 'No snippets available';
-              }
-              function cycleSnippets() {
-                  setInterval(() => {
-                      index = (index + 1) % snippets.length;
-                      updateSnippet();
-                  }, 2000);
-              }
-              updateSnippet();
-              cycleSnippets();
-          </script>
-      </body>
-      </html>`;
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: sans-serif; text-align: center; }
+                    pre { background:rgb(83, 76, 76); padding: 10px; white-space: pre-wrap; }
+                    .container { height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <pre id="snippet"></pre>
+                </div>
+                <script>
+                    const snippets = ${JSON.stringify(snippets)};
+                    let index = 0;
+                    function updateSnippet() {
+                        document.getElementById('snippet').textContent = snippets[index] || 'No snippets available';
+                    }
+                    function cycleSnippets() {
+                        setInterval(() => {
+                            index = (index + 1) % snippets.length;
+                            updateSnippet();
+                        }, 2000);
+                    }
+                    updateSnippet();
+                    cycleSnippets();
+                </script>
+            </body>
+            </html>`;
+  }
+
+  public dispose() {
+    SnippetReelPanel.currentPanel = undefined;
+    this.panel.dispose();
+    while (this.disposables.length) {
+      const disposable = this.disposables.pop();
+      if (disposable) {
+        disposable.dispose();
+      }
+    }
   }
 }
