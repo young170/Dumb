@@ -1,9 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { extractData } from "./extractData";
-import { getSnippets } from "./getSnippets";
+import { exec } from "child_process";
 
-const SNIPPETS_FILE = path.join(__dirname, "../src", "snippets.json");
+const SNIPPETS_FILE = path.join(__dirname, "../src", "github_code_data.json");
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new SnippetReelWebviewProvider(context.extensionUri);
@@ -22,9 +21,12 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const extractedData: Map<string, string[]> = extractData(editor.document);
-      const snippets: string[] = getSnippets(SNIPPETS_FILE, extractedData);
-      provider.updateSnippets(snippets);
+      const filePath = editor.document.fileName;
+      console.log(filePath);
+
+      getSnippetsPython(filePath).then((snippets) => {
+        provider.updateSnippets(snippets);
+      });
     }
   );
 
@@ -32,6 +34,31 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
+
+function getSnippetsPython(filePath: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const pythonPath = "python";
+    const scriptPath = path.join(__dirname, "../src/main.py");
+
+    exec(
+      `${pythonPath} ${scriptPath} --mode search --file ${filePath} --json ${SNIPPETS_FILE}`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error running Python script: ${error.message}`);
+          reject(error);
+          return;
+        }
+        console.log(`Python output: ${stdout}`);
+        try {
+          const snippets = JSON.parse(stdout);
+          resolve(snippets);
+        } catch (e) {
+          reject(e);
+        }
+      }
+    );
+  });
+}
 
 class SnippetReelWebviewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -98,7 +125,7 @@ class SnippetReelWebviewProvider implements vscode.WebviewViewProvider {
                 setInterval(() => {
                     index = (index + 1) % snippets.length;
                     updateSnippet();
-                }, 2000);
+                }, 1500);
             }
             updateSnippet();
             cycleSnippets();
