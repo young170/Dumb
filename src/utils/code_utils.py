@@ -38,3 +38,15 @@ def get_file_lang(filename: str) -> str:
     elif filename.endswith((".c")):
         return "c"
     return "unknown"
+
+def remove_comments(code: str, language: str) -> str:
+    """Removes comments from the given source code based on language."""
+    if language == "python":
+        code = re.sub(r"#.*", "", code)  # Remove single-line comments
+        code = re.sub(r'""".*?"""|\'\'\'.*?\'\'\'', "", code, flags=re.DOTALL)  # Remove multi-line comments
+
+    elif language in ["java", "cpp", "c"]:
+        code = re.sub(r"//.*", "", code)  # Remove single-line comments
+        code = re.sub(r"/\*.*?\*/", "", code, flags=re.DOTALL)  # Remove multi-line comments
+
+    return code.strip()

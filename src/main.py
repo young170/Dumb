@@ -6,7 +6,18 @@ from utils.recommendation import recommend_snippets
 
 def mine_mode(json_file: str):
     """Mines GitHub code and saves it to a JSON file."""
-    scraped_data = get_github_code_files(max_repos=10, max_files=30)
+    repo_list = ["RyanFehr/HackerRank", "jsquared21/Intro-to-Java-Programming", "knightsj/awesome-algorithm-question-solution",
+                 "cy69855522/Shortest-LeetCode-Python-Solutions", "gzwl/leetcode", "tech-cow/leetcode",
+                 "manishbisht/Competitive-Programming", "wuduhren/leetcode-python", "Garvit244/Leetcode",
+                 "nayuki/Project-Euler-solutions", "SamirPaulb/DSAlgo", "csujedihy/lc-all-solutions",
+                 "jimmysuncpt/Algorithms", "reneargento/algorithms-sedgewick-wayne", "gouthampradhan/leetcode",
+                 "MTrajK/coding-problems", "pedrovgs/Algorithms", "liuyubobobo/Play-Leetcode",
+                 "pezy/CppPrimer", "kamyu104/LeetCode-Solutions", "awangdev/leet-code",
+                 "fishercoder1534/Leetcode", "pezy/LeetCode", "sherxon/AlgoDS",
+                 "Blankj/awesome-java-leetcode", "grandyang/leetcode", "neetcode-gh/leetcode",
+                 "wisdompeak/LeetCode", "qiyuangong/leetcode", "haoel/leetcode",
+                 "doocs/leetcode"]
+    scraped_data = get_github_code_files(repo_list)
     save_data_to_json(scraped_data, json_file)
 
 def search_mode(file_path: str, json_file: str):
