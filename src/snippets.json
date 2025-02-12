@@ -1,0 +1,74 @@
+[
+  {
+    "file_name": "linked_list_traversal.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def append(self, data):\n        if not self.head:\n            self.head = Node(data)\n            return\n        current = self.head\n        while current.next:\n            current = current.next\n        current.next = Node(data)\n\n    def traverse(self):\n        current = self.head\n        while current:\n            print(current.data, end=' -> ')\n            current = current.next\n        print('None')",
+    "imports": [],
+    "functions": ["__init__", "append", "traverse"],
+    "variables": ["data", "head", "next", "current"]
+  },
+  {
+    "file_name": "linked_list_insertion.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def insert_at_beginning(self, data):\n        new_node = Node(data)\n        new_node.next = self.head\n        self.head = new_node\n\n    def display(self):\n        current = self.head\n        while current:\n            print(current.data, end=' -> ')\n            current = current.next\n        print('None')",
+    "imports": [],
+    "functions": ["__init__", "insert_at_beginning", "display"],
+    "variables": ["data", "head", "next", "new_node", "current"]
+  },
+  {
+    "file_name": "linked_list_deletion.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def delete_node(self, key):\n        temp = self.head\n        if temp is not None and temp.data == key:\n            self.head = temp.next\n            temp = None\n            return\n        prev = None\n        while temp is not None and temp.data != key:\n            prev = temp\n            temp = temp.next\n        if temp is None:\n            return\n        prev.next = temp.next\n        temp = None\n\n    def display(self):\n        current = self.head\n        while current:\n            print(current.data, end=' -> ')\n            current = current.next\n        print('None')",
+    "imports": [],
+    "functions": ["__init__", "delete_node", "display"],
+    "variables": ["data", "head", "next", "temp", "prev", "key", "current"]
+  },
+  {
+    "file_name": "linked_list_reverse.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def reverse(self):\n        prev = None\n        current = self.head\n        while current:\n            next_node = current.next\n            current.next = prev\n            prev = current\n            current = next_node\n        self.head = prev\n\n    def display(self):\n        current = self.head\n        while current:\n            print(current.data, end=' -> ')\n            current = current.next\n        print('None')",
+    "imports": [],
+    "functions": ["__init__", "reverse", "display"],
+    "variables": ["data", "head", "next", "prev", "current", "next_node"]
+  },
+  {
+    "file_name": "linked_list_length.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def get_length(self):\n        count = 0\n        current = self.head\n        while current:\n            count += 1\n            current = current.next\n        return count",
+    "imports": [],
+    "functions": ["__init__", "get_length"],
+    "variables": ["data", "head", "next", "count", "current"]
+  },
+  {
+    "file_name": "linked_list_middle.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def find_middle(self):\n        slow = self.head\n        fast = self.head\n        while fast and fast.next:\n            slow = slow.next\n            fast = fast.next.next\n        return slow.data if slow else None",
+    "imports": [],
+    "functions": ["__init__", "find_middle"],
+    "variables": ["data", "head", "next", "slow", "fast"]
+  },
+  {
+    "file_name": "linked_list_cycle.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\nclass LinkedList:\n    def __init__(self):\n        self.head = None\n\n    def has_cycle(self):\n        slow = self.head\n        fast = self.head\n        while fast and fast.next:\n            slow = slow.next\n            fast = fast.next.next\n            if slow == fast:\n                return True\n        return False",
+    "imports": [],
+    "functions": ["__init__", "has_cycle"],
+    "variables": ["data", "head", "next", "slow", "fast"]
+  },
+  {
+    "file_name": "linked_list_merge.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\ndef merge_sorted_lists(l1, l2):\n    dummy = Node(0)\n    tail = dummy\n    while l1 and l2:\n        if l1.data < l2.data:\n            tail.next = l1\n            l1 = l1.next\n        else:\n            tail.next = l2\n            l2 = l2.next\n        tail = tail.next\n    tail.next = l1 or l2\n    return dummy.next",
+    "imports": [],
+    "functions": ["__init__", "merge_sorted_lists"],
+    "variables": ["data", "head", "next", "l1", "l2", "dummy", "tail"]
+  },
+  {
+    "file_name": "linked_list_intersection.py",
+    "language": "python",
+    "source_code": "class Node:\n    def __init__(self, data):\n        self.data = data\n        self.next = None\n\ndef get_intersection_node(headA, headB):\n    nodes = set()\n    while headA:\n        nodes.add(headA)\n        headA = headA.next\n    while headB:\n        if headB in nodes:\n            return headB\n        headB = headB.next\n    return None",
+    "imports": [],
+    "functions": ["__init__", "get_intersection_node"],
+    "variables": ["data", "head", "next", "headA", "headB", "nodes"]
+  }
+]

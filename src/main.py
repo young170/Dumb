@@ -1,25 +1,19 @@
 import argparse
+import json
 from utils.github_utils import get_github_code_files
 from utils.file_utils import save_data_to_json
 from utils.recommendation import recommend_snippets
 
 def mine_mode(json_file: str):
     """Mines GitHub code and saves it to a JSON file."""
-    print(f"Mining GitHub repositories and saving to {json_file}...")
     scraped_data = get_github_code_files(max_repos=10, max_files=30)
     save_data_to_json(scraped_data, json_file)
-    print(f"Mining completed. Data saved to {json_file}.")
 
 def search_mode(file_path: str, json_file: str):
     """Searches for similar code snippets using the mined data."""
-    print(f"Searching for recommendations based on {file_path}...")
-    recommended_snippets = recommend_snippets(file_path, json_file, N=5)
-    
-    print("\nRecommended Snippets:")
-    for snippet in recommended_snippets:
-        print(snippet["file_name"])
-
-    save_data_to_json(recommended_snippets, "recommended.json")
+    recommended_snippets = recommend_snippets(file_path, json_file, N=3)
+    source_codes = [snippet["source_code"] for snippet in recommended_snippets]
+    print(json.dumps(source_codes))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GitHub Code Mining and Search System")

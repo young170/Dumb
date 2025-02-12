@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { exec } from "child_process";
 
-const SNIPPETS_FILE = path.join(__dirname, "../src", "github_code_data.json");
+const SNIPPETS_FILE = path.join(__dirname, "../src", "snippets.json");
 
 export function activate(context: vscode.ExtensionContext) {
   const provider = new SnippetReelWebviewProvider(context.extensionUri);
@@ -22,7 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const filePath = editor.document.fileName;
-      console.log(filePath);
 
       getSnippetsPython(filePath).then((snippets) => {
         provider.updateSnippets(snippets);
@@ -48,7 +47,6 @@ function getSnippetsPython(filePath: string): Promise<string[]> {
           reject(error);
           return;
         }
-        console.log(`Python output: ${stdout}`);
         try {
           const snippets = JSON.parse(stdout);
           resolve(snippets);
@@ -125,7 +123,7 @@ class SnippetReelWebviewProvider implements vscode.WebviewViewProvider {
                 setInterval(() => {
                     index = (index + 1) % snippets.length;
                     updateSnippet();
-                }, 1500);
+                }, 2000);
             }
             updateSnippet();
             cycleSnippets();
